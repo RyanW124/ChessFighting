@@ -1,2 +1,2 @@
 # Game-Design
-My thing
+To play a game, run the main.py file
