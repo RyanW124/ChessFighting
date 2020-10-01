@@ -2,7 +2,7 @@ import pygame, Controller, main, Model, convertpath, Martials
 
 from random import randint
 animations = [IDLE, ATTACK_ONE, ATTACK_TWO, JUMP, FALL, RUN, TAKE_HIT, DEATH] = range(8)
-SIZE = (1.7*830, 830)
+SIZE = None
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -11,13 +11,15 @@ GREY = (100, 100, 100)
 PURPLE = (255, 0, 255)
 r_value = 150
 BROWN = (r_value, r_value/2, 0)
-def game_fight(surface : pygame.Surface, game, clock):
+def game_fight(surface : pygame.Surface, game, clock, keys):
+    global SIZE
+    SIZE = (main.window_size_x, main.window_size_y)
     quit = False
     bkgrnd = str(randint(1, 2))
 
     blit_image(surface, ['Background', bkgrnd+'.png'], "topleft", (0,0), (int(SIZE[0]), int(SIZE[1])))
 #     blit_image(surface, ['Martial Hero', 'Sprites', 'Idle.png'], "topleft", (0,0))
-    time = 60
+    time = main.fight_time
     p1 = game.p1.fighter
     p2 = game.p2.fighter
     pl = False
@@ -29,7 +31,7 @@ def game_fight(surface : pygame.Surface, game, clock):
     while True:
         clock.tick(30)
         surface.fill((0,0,0))
-        quit, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j)
+        quit, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j, keys)
 
         if pl2 and not pr2 and p2.animation!=TAKE_HIT and p2.rect.left>p2.speed:
             p2.dir = False

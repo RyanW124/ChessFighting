@@ -1,6 +1,6 @@
 import Chess, pygame, Controller, main, Model, convertpath
 
-SIZE = (1.7*830, 830)
+SIZE = None
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -9,16 +9,18 @@ GREY = (100, 100, 100)
 PURPLE = (255, 0, 255)
 r_value = 150
 BROWN = (r_value, r_value/2, 0)
-def game_chess(surface : pygame.Surface, game, clock):
+def game_chess(surface : pygame.Surface, game, clock, keys):
+    global SIZE
+    SIZE = (main.window_size_x, main.window_size_y)
     quit = False
     selected = None
     board_rect = pygame.Rect(SIZE[0]*0.1, SIZE[1]*0.25, SIZE[0]*0.3, SIZE[0]*0.3)
     board_rect2 = board_rect.copy()
     board_rect2.left+= SIZE[0]/2+5
-    time = 60
+    time = main.chess_time
     while True:
         clock.tick(30)
-        quit, selected = Controller.chess(board_rect, board_rect2, game, selected)
+        quit, selected = Controller.chess(board_rect, board_rect2, game, selected, keys)
 
         if quit:
             break
@@ -27,22 +29,23 @@ def game_chess(surface : pygame.Surface, game, clock):
         if game.board.turn:
             game.p1.time-=clock.get_time()/1000
             game.p1.move_time-=clock.get_time()/1000
-            if game.p1.time<=0 or game.p2.move_time<=0:
+            if game.p1.time<=0 or game.p1.move_time<=0:
                 game.winner = game.p2
+
         else:
             game.p2.move_time-=clock.get_time()/1000
             game.p2.time-=clock.get_time()/1000
-            if game.p1.time<=0 or game.p1.move_time<=0:
+            if game.p1.time<=0 or game.p2.move_time<=0:
                 game.winner = game.p1
         if time <= 0:
             break
         pygame.display.flip()
         if game.winner:
-            quit = game_end(surface, game)
+            quit = game_end(surface, game, keys)
             if quit:
                 break
     return quit
-def game_end(surface, game):
+def game_end(surface, game, keys):
     font = pygame.font.Font('freesansbold.ttf', 50)
     rect = pygame.Rect(0, 0, SIZE[0]*0.6, SIZE[1]*0.2)
     rect.center = (SIZE[0]/2, SIZE[1]/2)
@@ -60,7 +63,7 @@ def game_end(surface, game):
     surface.blit(text, textRect)
     pygame.display.flip()
     while True:
-        quit = Controller.game_end()
+        quit = Controller.game_end(keys)
         if quit:
             break
     return quit
@@ -145,7 +148,6 @@ def chess_update(surface : pygame.Surface, game, selected, b, b2, time):
             if (r+c)%2 == 1:
                 square_rect.topleft = (board_rect.left+r*board_rect.width/8, board_rect.top+c*board_rect.height/8)
                 pygame.draw.rect(surface, BROWN, square_rect)
-            else:
                 square_rect.topleft = (board_rect2.left+r*board_rect2.width/8, board_rect2.top+c*board_rect2.height/8)
                 pygame.draw.rect(surface, BROWN, square_rect)
     for r in range(8):
@@ -157,10 +159,10 @@ def chess_update(surface : pygame.Surface, game, selected, b, b2, time):
                     t = "black"
                 if (r+c) %2==0:
                     tex = 'b'
-                    tex2 = 'w'
+                    tex2 = 'b'
                 else:
                     tex = 'w'
-                    tex2 = 'b'
+                    tex2 = 'w'
                 if board.turn:
 
 
@@ -250,14 +252,16 @@ def blit_chess(surface, path, anchor, pos, size = None):
     elif anchor == "topleft":
         rect.topleft = pos
     surface.blit(image, rect)
-def countdown(surface, game, clock):
+def countdown(surface, game, clock, keys):
+    global SIZE
+    SIZE = (main.window_size_x, main.window_size_y)
     time = 3
     font = pygame.font.Font('freesansbold.ttf', 200)
     while True:
         clock.tick(10)
         surface.fill(BLACK)
         time -= clock.get_time()/1000
-        quit = Controller.count()
+        quit = Controller.count(keys)
         if quit:
             break
         te = None
