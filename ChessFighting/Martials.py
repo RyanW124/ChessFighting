@@ -4,6 +4,8 @@ SIZE = (1.7*830, 830)
 class Blue(pygame.sprite.Sprite):
     max_jump = 30
     gravity = 6
+    damage_1 = 5
+    damage_2 = 3
     def __init__(self, sprite_path, x, y, parent):
         pygame.sprite.Sprite.__init__(self)
         self.x = x
@@ -65,7 +67,7 @@ class Blue(pygame.sprite.Sprite):
             self.t2+=1
         if self.animation == ATTACK_ONE and self.rect.colliderect(oppo.rect) and not self.already:
             self.already = True
-            oppo.take_damage(10, self.x)
+            oppo.take_damage(self.damage_1, self.x)
         if self.knockback<0:
             self.x+=self.knockback
             self.knockback+=1
@@ -162,8 +164,10 @@ class Bullet(pygame.sprite.Sprite):
             self.x-=self.speed
             self.rect.centerx-=self.speed
         if self.rect.colliderect(self.oppo.rect):
-            self.oppo.parent.consciousness-=3
+            self.oppo.parent.consciousness-=Blue.damage_2
             Bullet.bullets.remove(self)
+            del self
+        elif self.rect.right<0 or self.rect.left>SIZE[0]:
             del self
     def draw(self, surface):
         im = self.image

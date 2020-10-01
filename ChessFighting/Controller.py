@@ -1,6 +1,30 @@
 import pygame, main, Chess
 from string import ascii_lowercase
 from Model import Button
+def help_menu(keys):
+    quit = False
+    button = None
+    direction = None
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == keys.quit:
+                quit = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 1:
+                for i in Button.settings:
+                    if i.rect.collidepoint(event.pos):
+                        button = i.name
+                        break
+                else:
+                    button = False
+            if event.button ==4:
+                direction = False
+            if event.button == 5:
+                direction = True
+    return quit, button, direction
 def settings(keys):
     quit = False
     button = None

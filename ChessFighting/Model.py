@@ -24,6 +24,7 @@ class Game:
 class Button:
     main_menu = []
     settings = []
+    help_menu = []
     def __init__(self, rect, text, color, name, textColor, scene, outline = None):
         self.rect = rect
         self.text = text

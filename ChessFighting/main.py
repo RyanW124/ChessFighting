@@ -66,26 +66,32 @@ def main():
         rect.centery += SIZE[1]/6
 
     Button(pygame.Rect(10, 10, SIZE[0]*0.1, SIZE[1]/10), 'Back', BLACK, 'back', PURPLE, Button.settings, (PURPLE, 5))
-
+    Button(pygame.Rect(10, 10, SIZE[0]*0.1, SIZE[1]/10), 'Back', BLACK, 'back', PURPLE, Button.help_menu, (PURPLE, 5))
     while True:
         quit = UI.main_menu(surface, clock, keys)
         if quit:
             break
         while True:
-            game.p1.update_time()
-            game.p2.update_time()
-            quit = scenes.countdown(surface, game, clock, keys)
-            if quit:
-                break
-            quit = scenes.game_chess(surface, game, clock, keys)
-            if quit:
-                break
-            game.round+=1
-            if game.round == 10:
-                break
-            quit = scenes.countdown(surface, game, clock, keys)
-            if quit:
-                break
+            # game.p1.update_time()
+#             game.p2.update_time()
+#             quit = scenes.countdown(surface, game, clock, keys)
+#             if quit:
+#                 break
+#             quit = scenes.game_chess(surface, game, clock, keys)
+#             if quit:
+#                 break
+#             game.round+=1
+#             if game.round == 10:
+#                 break
+
+#             quit = scenes.countdown(surface, game, clock, keys)
+#             if quit:
+#                 break
+            for i in Martials.Bullet.bullets:
+                del i
+            Martials.Bullet.bullets.clear()
+            game.p1.fighter.x, game.p1.fighter.y = 10, window_size_y
+            game.p2.fighter.x, game.p2.fighter.y = window_size_x-30, window_size_y
             quit = fight.game_fight(surface, game, clock, keys)
             if quit:
                 break

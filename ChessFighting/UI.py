@@ -1,4 +1,4 @@
-import pygame, main, Controller, convertpath
+import pygame, main, Controller, convertpath, Model, Martials
 from Model import Button
 
 SIZE = None
@@ -23,15 +23,33 @@ def main_menu(surface, clock, keys):
         elif button == 'quit':
             quit = True
         elif button == 'help':
-            quit = help_menu(surface)
+            quit = help_menu(surface, keys)
         elif button == 'settings':
             quit = settings(surface, keys)
         if quit:
             break
         pygame.display.flip()
     return quit
-def help():
-    pass
+def help_menu(surface, keys):
+    while True:
+        quit, button, direction = Controller.help_menu(keys)
+        surface.fill(BLACK)
+        rect = pygame.Rect(SIZE[0]/4, 0, SIZE[0]/2, SIZE[1])
+        text = f'''
+    • Each game has 9 rounds total, each round alternates between chess and martial arts
+    • Each player has an attribute called consciousness. The lower a player's consciousness, the less time the player can think for each move in chess
+    • A player loses if they get checkmated, consciousness reaches 0, or they run out of time in chess
+    • If a stalemate occurs or all 9 rounds finish, then whoever has more consciousness wins. If both players have the same amount of consciousness, player 2 wins.
+    • Martial arts description: Attack 1 is a melee attack that deals {str(Martials.Blue.damage_1)} damage. Attack 2 is a long range attack that deals {str(Martials.Blue.damage_2)} damage. You can change controls in the settings menu'''
+        text_surface = word_wrap(rect, pygame.font.Font('freesansbold.ttf', 30), WHITE, text)
+        for i in Button.help_menu:
+            surface.blit(i.surface, i.rect)
+        surface.blit(text_surface, rect)
+        if quit or button == 'back':
+            break
+        pygame.display.flip()
+    return quit
+
 
 def settings(surface, keys):
 
@@ -201,5 +219,60 @@ def blit_image(surface, path, anchor, pos, size = None, flip = False):
     if flip:
         image = pygame.transform.flip(image, True, False)
     surface.blit(image, rect)
+def word_wrap(rect, font, color, text):
+    ''' Wrap the text into the space of the rect, using the font object provided.
+        Returns a surface of rect size with the text rendered in it.
+    '''
+    linesize = font.get_linesize()
+    words = text.split(' ')
+    width, height = rect.size
+    lines = []
+    line = ''
+    length = 0
+    surface = pygame.Surface((width, height))
+
+    for word in words:
+        if '\n' in word:
+            index = word.index('\n')
+            if length+font.size(word[:index])[0] > width-1:
+
+                lines.append(line)
+                line = word[:index]
+                lines.append(line)
+
+            else:
+
+                line += word[:index]
+                lines.append(line)
+
+            length = font.size(word[index+2:]+' ')[0]
+
+            line = word[index+1:] + ' '
+        elif length+font.size(word)[0] < width-1:
+            length += font.size(word+' ')[0]
+            line += word+' '
+
+
+        else:
+            line = line[:-1]
+
+            lines.append(line)
+
+            length = font.size(word+' ')[0]
+
+            line = word+' '
+
+    line = line[:-1]
+    lines.append(line)
+    y = 0
+    for line in lines:
+        if line.startswith(' '):
+            y+=linesize
+        font_obj = font.render(line, True, color)
+        surface.blit(font_obj, pygame.Rect(0, y, width, y+linesize))
+        y += linesize
+
+    surface.set_colorkey((0,0,0))
+    return surface
 if __name__ == '__main__':
     main.main()
