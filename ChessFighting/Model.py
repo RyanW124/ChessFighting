@@ -8,8 +8,8 @@ class Player:
         self.move_time = 30
     def update_time(self):
         self.move_time = int(self.consciousness*0.3)
-        if self.move_time<5:
-            self.move_time=5
+        if self.move_time<10:
+            self.move_time=10
         if self.move_time>self.time:
             self.move_time = self.time
 

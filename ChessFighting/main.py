@@ -72,21 +72,21 @@ def main():
         if quit:
             break
         while True:
-            # game.p1.update_time()
-#             game.p2.update_time()
-#             quit = scenes.countdown(surface, game, clock, keys)
-#             if quit:
-#                 break
-#             quit = scenes.game_chess(surface, game, clock, keys)
-#             if quit:
-#                 break
-#             game.round+=1
-#             if game.round == 10:
-#                 break
+            game.p1.update_time()
+            game.p2.update_time()
+            quit = scenes.countdown(surface, game, clock, keys)
+            if quit:
+                break
+            quit = scenes.game_chess(surface, game, clock, keys)
+            if quit:
+                break
+            game.round+=1
+            if game.round == 10:
+                break
 
-#             quit = scenes.countdown(surface, game, clock, keys)
-#             if quit:
-#                 break
+            quit = scenes.countdown(surface, game, clock, keys)
+            if quit:
+                break
             for i in Martials.Bullet.bullets:
                 del i
             Martials.Bullet.bullets.clear()
