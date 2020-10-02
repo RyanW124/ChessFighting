@@ -1,0 +1,5 @@
+This game is made by Ryan Wong in grade 10
+
+The Chess.py file is an imported library written by Niklas Fiekas 
+
+Not including the Chess.py file, this game has 1655 lines of code.
