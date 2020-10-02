@@ -1,5 +1,5 @@
 import Chess, pygame, Controller, main, Model, convertpath
-
+from UI import pause_menu
 SIZE = None
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -17,38 +17,64 @@ def game_chess(surface : pygame.Surface, game, clock, keys):
     board_rect = pygame.Rect(SIZE[0]*0.1, SIZE[1]*0.25, SIZE[0]*0.3, SIZE[0]*0.3)
     board_rect2 = board_rect.copy()
     board_rect2.left+= SIZE[0]/2+5
-    time = main.chess_time
+    time = game.chess_time
+    home = False
     while True:
         clock.tick(30)
-        quit, selected = Controller.chess(board_rect, board_rect2, game, selected, keys)
-
-        if quit:
-            break
-        chess_update(surface, game, selected, board_rect, board_rect2, time)
-        time-=clock.get_time()/1000
-        if game.board.turn:
-            game.p1.time-=clock.get_time()/1000
-            game.p1.move_time-=clock.get_time()/1000
-            if game.p1.time<=0 or game.p1.move_time<=0:
-                game.winner = game.p2
-
+        quit, selected, pause = Controller.chess(board_rect, board_rect2, game, selected, keys)
+        if pause:
+            quit, home = pause_menu(surface, keys)
+            clock.tick(30)
         else:
-            game.p2.move_time-=clock.get_time()/1000
-            game.p2.time-=clock.get_time()/1000
-            if game.p1.time<=0 or game.p2.move_time<=0:
-                game.winner = game.p1
-        if time <= 0:
+            game.chess_time-=clock.get_time()/1000
+            if game.board.turn:
+                game.p1.time-=clock.get_time()/1000
+                p=False
+                if game.p1.move_time>=3:
+                    p =True
+                game.p1.move_time-=clock.get_time()/1000
+                if game.p1.move_time<=3:
+                    if p:
+                        Model.AudioController('count.wav', 0.2)
+
+                if game.p1.time<=0 or game.p1.move_time<=0:
+                    game.winner = game.p2
+
+            else:
+                game.p2.move_time-=clock.get_time()/1000
+                p=False
+                if game.p2.move_time>=3:
+                    p =True
+                game.p2.time-=clock.get_time()/1000
+                if game.p1.move_time<=3:
+                    if p:
+                        Model.AudioController('count.wav', 0.2)
+                if game.p1.time<=0 or game.p2.move_time<=0:
+                    game.winner = game.p1
+            if game.chess_time <= 0:
+                game.chess_time = 60
+                break
+        if quit or home:
             break
+        chess_update(surface, game, selected, board_rect, board_rect2)
+
         pygame.display.flip()
         if game.winner:
-            quit = game_end(surface, game, keys)
-            if quit:
+            quit, home = game_end(surface, game, keys)
+            if quit or home:
                 break
-    return quit
+    return quit, home
 def game_end(surface, game, keys):
+    game.finished = True
     font = pygame.font.Font('freesansbold.ttf', 50)
     rect = pygame.Rect(0, 0, SIZE[0]*0.6, SIZE[1]*0.2)
     rect.center = (SIZE[0]/2, SIZE[1]/2)
+
+
+    from Model import Button
+    i = Button.get_button(Button.end, 'home')
+    surface.blit(i.surface, i.rect)
+    temp = surface.copy()
     pygame.draw.rect(surface, BLACK, rect)
     if game.winner == game.p1:
         pygame.draw.rect(surface, BLUE, rect, 5)
@@ -61,13 +87,22 @@ def game_end(surface, game, keys):
     textRect = text.get_rect()
     textRect.center = (SIZE[0]/2, SIZE[1]/2)
     surface.blit(text, textRect)
+
+    i = Button.get_button(Button.end, 'hide')
+    surface.blit(i.surface, i.rect)
     pygame.display.flip()
+    home = False
     while True:
-        quit = Controller.game_end(keys)
-        if quit:
+        quit, button = Controller.game_end(keys)
+        if quit or button == 'home':
+            home = button=='home'
+
             break
-    return quit
-def chess_update(surface : pygame.Surface, game, selected, b, b2, time):
+        if button == 'hide':
+            surface.blit(temp, (0,0))
+            pygame.display.flip()
+    return quit, home
+def chess_update(surface : pygame.Surface, game, selected, b, b2):
 
     board_rect = b.copy()
     board_rect2 = b2.copy()
@@ -78,7 +113,7 @@ def chess_update(surface : pygame.Surface, game, selected, b, b2, time):
     pygame.draw.rect(surface, RED, pygame.Rect(SIZE[0]/2, 0.85*SIZE[1], SIZE[0]/2, 0.15*SIZE[1]))
     temp = show_con(game.p2, RED)
     surface.blit(temp, pygame.Rect(10+SIZE[0]/2, 0.85*SIZE[1]+5, temp.get_width(), temp.get_height()))
-    pygame.draw.rect(surface, GREY, pygame.Rect(SIZE[0]/2-5, 0, 10, SIZE[1]))
+    pygame.draw.rect(surface, PURPLE, pygame.Rect(SIZE[0]/2-5, 0, 10, SIZE[1]))
     pygame.draw.polygon(surface, BLUE, [(0, 50), (200, 50), (130, 100), (175, 75), (100, 150), (0, 150)])
     pygame.draw.polygon(surface, RED, [(SIZE[0]/2+5, 50), (200+SIZE[0]/2+5, 50), (130+SIZE[0]/2+5, 100), (175+SIZE[0]/2+5, 75), (100+SIZE[0]/2+5, 150), (SIZE[0]/2+5, 150)])
 
@@ -115,7 +150,7 @@ def chess_update(surface : pygame.Surface, game, selected, b, b2, time):
     textRect.midtop = (SIZE[0]/2, SIZE[1]*0.47)
     surface.blit(text, textRect)
 
-    text = font.render(f"Time left: {int(time)}s", True, PURPLE, BLACK)
+    text = font.render(f"Time left: {int(game.chess_time)}s", True, PURPLE, BLACK)
     textRect = text.get_rect()
     textRect.midbottom = (SIZE[0]/2, SIZE[1]*0.53)
     surface.blit(text, textRect)
@@ -257,6 +292,8 @@ def countdown(surface, game, clock, keys):
     SIZE = (main.window_size_x, main.window_size_y)
     time = 3
     font = pygame.font.Font('freesansbold.ttf', 200)
+    t = 3
+    Model.AudioController('count.wav', 0.2)
     while True:
         clock.tick(10)
         surface.fill(BLACK)
@@ -265,7 +302,11 @@ def countdown(surface, game, clock, keys):
         if quit:
             break
         te = None
+        if time+1<=t and t>0:
+            t-=1
+            Model.AudioController('count.wav', 0.2)
         if time>0:
+
             text = font.render(str(int(time)+1), True, WHITE, BLACK)
             textRect = text.get_rect()
             textRect.center = (SIZE[0]/2, SIZE[1]/2)

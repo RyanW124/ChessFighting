@@ -8,10 +8,10 @@ BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 GREY = (100, 100, 100)
 PURPLE = (255, 0, 255)
-def main_menu(surface, clock, keys):
+def main_menu(surface, clock, keys, saved):
     global SIZE
     SIZE = (main.window_size_x, main.window_size_y)
-
+    save = False
     while True:
         surface.fill(BLACK)
         quit, button = Controller.main_menu(keys)
@@ -19,7 +19,8 @@ def main_menu(surface, clock, keys):
         for i in Button.main_menu:
             surface.blit(i.surface, i.rect)
         if button == 'start':
-           break
+            quit, save = choose(surface, keys, saved)
+            break
         elif button == 'quit':
             quit = True
         elif button == 'help':
@@ -29,7 +30,32 @@ def main_menu(surface, clock, keys):
         if quit:
             break
         pygame.display.flip()
-    return quit
+    return quit, save
+def choose(surface, keys, saved):
+    save = None
+    quit = False
+    while True:
+        quit, button = Controller.choose(keys, saved)
+        surface.fill(BLACK)
+        if quit:
+            break
+        if button == 'continue':
+            save = True
+            break
+        elif button == 'new':
+            save = False
+            break
+        elif button == 'back':
+            break
+        for i in Button.choose:
+
+            if i.name =='continue':
+                if saved:
+                    surface.blit(i.surface, i.rect)
+            else:
+                surface.blit(i.surface, i.rect)
+        pygame.display.flip()
+    return quit, save
 def help_menu(surface, keys):
     while True:
         quit, button, direction = Controller.help_menu(keys)
@@ -274,5 +300,32 @@ def word_wrap(rect, font, color, text):
 
     surface.set_colorkey((0,0,0))
     return surface
+def pause_menu(surface, keys):
+    temp = surface.copy()
+    surface.fill(BLACK)
+    temp.set_alpha(63)
+    surface.blit(temp, (0,0))
+    font = pygame.font.Font('freesansbold.ttf', 100)
+    text = font.render("Paused", True, PURPLE, BLACK)
+    textRect = text.get_rect()
+    textRect.midbottom = (SIZE[0]/2, SIZE[1]*0.24)
+    surface.blit(text, textRect)
+    for i in Button.pause:
+        surface.blit(i.surface, i.rect)
+    temp = surface.copy()
+
+    while True:
+        quit, unpause, button = Controller.pause(keys)
+        surface.blit(temp, (0,0))
+
+        if button == 'quit':
+            quit = True
+        if button == 'settings':
+            quit = settings(surface, keys)
+        if quit or button == 'unpause' or unpause or button == 'home':
+            home = button == 'home'
+            break
+        pygame.display.flip()
+    return quit, home
 if __name__ == '__main__':
     main.main()

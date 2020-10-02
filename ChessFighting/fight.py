@@ -1,5 +1,5 @@
 import pygame, Controller, main, Model, convertpath, Martials
-
+from UI import pause_menu
 from random import randint
 animations = [IDLE, ATTACK_ONE, ATTACK_TWO, JUMP, FALL, RUN, TAKE_HIT, DEATH] = range(8)
 SIZE = None
@@ -19,7 +19,7 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
 
     blit_image(surface, ['Background', bkgrnd+'.png'], "topleft", (0,0), (int(SIZE[0]), int(SIZE[1])))
 #     blit_image(surface, ['Martial Hero', 'Sprites', 'Idle.png'], "topleft", (0,0))
-    time = main.fight_time
+
     p1 = game.p1.fighter
     p2 = game.p2.fighter
     pl = False
@@ -28,10 +28,12 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
     pl2 = False
     pr2 = False
     p2j = False
+    home = False
+    music = Model.AudioController('fight.wav', 0.2, -1)
     while True:
         clock.tick(30)
         surface.fill((0,0,0))
-        quit, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j, keys)
+        quit, pause, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j, keys)
 
         if pl2 and not pr2 and p2.animation!=TAKE_HIT and p2.rect.left>p2.speed:
             p2.dir = False
@@ -72,7 +74,7 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
                 p1.animation = IDLE
         if p1j and p1.y>=SIZE[1]*0.8:
             p1.jump()
-        time-=clock.get_time()/1000
+
         if shoot and p1.t1>=p1.cd1 and not p1.animation in [ATTACK_ONE, ATTACK_TWO]:
             p1.animate(2, ATTACK_ONE, False)
             p1.t1 = 0
@@ -88,33 +90,44 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
 
         surface.blit(p1_surface, p1.rect)
         surface.blit(p2_surface, p2.rect)
-        update_UI(surface, game, time)
         for i in Martials.Bullet.bullets:
             i.update()
             i.draw(surface)
+        update_UI(surface, game)
+
+
+        pygame.display.flip()
         if quit:
             break
 
         if game.p1.consciousness<=0:
             game.winner = game.p2
-            quit = game_end(surface, game)
+
+            quit, home = game_end(surface, game, keys)
         if game.p2.consciousness<=0:
             game.winner = game.p1
-            quit = game_end(surface, game)
-        if quit:
+            quit, home = game_end(surface, game, keys)
+        if pause:
+            quit, home = pause_menu(surface, keys)
+            clock.tick()
+        else:
+            game.fight_time-=clock.get_time()/1000
+        if quit or home:
             break
-        if time<=0:
+        if game.fight_timetime<=0:
+            game.fight_time = 30
             break
         pygame.display.flip()
-    return quit
-def update_UI(surface, game, time):
+    music.stop()
+    return quit, home
+def update_UI(surface, game):
     pygame.draw.rect(surface, PURPLE, pygame.Rect(SIZE[0]*0.4, -5, SIZE[0]/5, SIZE[1]*0.1), 5)
     font = pygame.font.Font('freesansbold.ttf', 20)
     text = font.render(f"Round {str(game.round)}", True, PURPLE, BLACK)
     textRect = text.get_rect()
     textRect.midtop = (SIZE[0]/2, 5)
     surface.blit(text, textRect)
-    text = font.render(f"Time left: {str(int(time))}", True, PURPLE, BLACK)
+    text = font.render(f"Time left: {str(int(game.fight_time))}", True, PURPLE, BLACK)
     textRect = text.get_rect()
     textRect.midbottom = (SIZE[0]/2, SIZE[1]*0.09)
     surface.blit(text, textRect)
@@ -142,7 +155,8 @@ def blit_image(surface, path, anchor, pos, size = None):
     elif anchor == "topleft":
         rect.topleft = pos
     surface.blit(image, rect)
-def game_end(surface, game):
+def game_end(surface, game, keys):
+    game.finished = True
     font = pygame.font.Font('freesansbold.ttf', 50)
     rect = pygame.Rect(0, 0, SIZE[0]*0.6, SIZE[1]*0.2)
     rect.center = (SIZE[0]/2, SIZE[1]/2)
@@ -158,12 +172,17 @@ def game_end(surface, game):
     textRect = text.get_rect()
     textRect.center = (SIZE[0]/2, SIZE[1]/2)
     surface.blit(text, textRect)
+    for i in Model.Button.end:
+        surface.blit(i.surface, i.rect)
     pygame.display.flip()
+    home = False
     while True:
-        quit = Controller.game_end()
-        if quit:
+        quit, button = Controller.game_end(keys)
+        if quit or button == 'home':
+            home = button=='home'
+
             break
-    return quit
+    return quit, home
 def show_con(player, color):
 
     surface = pygame.Surface((SIZE[0]*0.4, (SIZE[1]*0.1)))
@@ -174,12 +193,12 @@ def show_con(player, color):
     textRect.topleft = (5, 5)
     surface.blit(text, textRect)
     pygame.draw.rect(surface, BLACK, pygame.Rect(5, 30, surface.get_width()*0.9, 10))
-    text = font.render(str(player.consciousness), True, WHITE, color)
+    text = font.render(str(player.consciousness) if player.consciousness>=0 else '0', True, WHITE, color)
     textRect = text.get_rect()
     textRect.topleft = (surface.get_width()*0.9, 5)
     surface.blit(text, textRect)
-
-    pygame.draw.rect(surface, WHITE, pygame.Rect(7, 32, surface.get_width()*0.9*player.consciousness/100-4, 6))
+    if player.consciousness>0:
+        pygame.draw.rect(surface, WHITE, pygame.Rect(7, 32, surface.get_width()*0.9*player.consciousness/100-4, 6))
     return surface
 def show_cd(player, color):
 

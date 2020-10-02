@@ -1,6 +1,56 @@
 import pygame, main, Chess
 from string import ascii_lowercase
+
 from Model import Button
+def pause(keys):
+    quit = False
+    button = None
+    unpause = False
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == keys.quit:
+                quit = True
+            if event.key == keys.pause:
+                unpause = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 1:
+                for i in Button.pause:
+                    if i.rect.collidepoint(event.pos):
+                        button = i.name
+                        break
+                else:
+                    button = False
+            if event.button ==4:
+                direction = False
+            if event.button == 5:
+                direction = True
+    return quit, unpause, button
+def choose(keys, saved):
+    quit = False
+    button = None
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == keys.quit:
+                quit = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 1:
+                for i in Button.choose:
+                    if i.name == 'continue':
+
+                        if i.rect.collidepoint(event.pos) and saved:
+                            button = i.name
+                            break
+                    else:
+                        if i.rect.collidepoint(event.pos):
+                            button = i.name
+                            break
+    return quit, button
 def help_menu(keys):
     quit = False
     button = None
@@ -72,6 +122,7 @@ def fight1(game, p1_left, p1_right, p1j, p2_left, p2_right, p2j, keys):
     pl2 = p2_left
     pr2 = p2_right
     p2_jump = p2j
+    pause = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit = True
@@ -99,6 +150,8 @@ def fight1(game, p1_left, p1_right, p1j, p2_left, p2_right, p2j, keys):
         if event.type == pygame.KEYDOWN:
             if event.key == keys.quit:
                 quit = True
+            if event.key == keys.pause:
+                pause = True
             if event.key == keys.p1_attack2:
                 s1 = True
             if event.key == keys.p1_attack1:
@@ -118,7 +171,7 @@ def fight1(game, p1_left, p1_right, p1j, p2_left, p2_right, p2j, keys):
                 p1_jump = False
 
 
-    return quit, shoot, pl, pr, p1_jump, shoot2, pl2, pr2, p2_jump, s1, s2
+    return quit, pause, shoot, pl, pr, p1_jump, shoot2, pl2, pr2, p2_jump, s1, s2
 def count(keys):
     quit = False
     for event in pygame.event.get():
@@ -130,22 +183,35 @@ def count(keys):
     return quit
 def game_end(keys):
     quit = False
+    button = None
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit = True
         if event.type == pygame.KEYDOWN:
             if event.key == keys.quit:
                 quit = True
-    return quit
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 1:
+                for i in Button.end:
+                    if i.rect.collidepoint(event.pos):
+                        button = i.name
+                        break
+                else:
+                    button = False
+    return quit, button
 def chess(b, b2, game, sq, keys):
     square = sq
     quit = False
+    pause = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit = True
         if event.type == pygame.KEYDOWN:
             if event.key == keys.quit:
                 quit = True
+            if event.key == keys.pause:
+                pause = True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -203,6 +269,6 @@ def chess(b, b2, game, sq, keys):
                                 game.winner = game.p1
                             else:
                                 game.winner = game.p2
-    return quit, square
+    return quit, square, pause
 if __name__ == "__main__":
     main.main()

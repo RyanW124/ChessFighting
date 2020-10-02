@@ -42,7 +42,9 @@ class Blue(pygame.sprite.Sprite):
                             [pygame.Rect(83, 75, 36, 53), pygame.Rect(283, 74, 37, 54)],
                             [pygame.Rect(72, 81, 44, 47), pygame.Rect(272, 81, 44, 47), pygame.Rect(472, 81, 44, 47), pygame.Rect(672, 81, 44, 47),
                             pygame.Rect(872, 81, 44, 47), pygame.Rect(1072, 81, 44, 47), pygame.Rect(1272, 81, 44, 47), pygame.Rect(1472, 81, 44, 47)],
-                            [pygame.Rect(80, 71, 36, 55), pygame.Rect(280, 72, 30, 56), pygame.Rect(481, 72, 33, 56)]
+                            [pygame.Rect(80, 71, 36, 55), pygame.Rect(280, 72, 30, 56), pygame.Rect(481, 72, 33, 56)],
+                            [pygame.Rect(82, 72, 32, 56), pygame.Rect(284, 76, 33, 51), pygame.Rect(489, 86, 38, 41), pygame.Rect(686, 82, 33, 46),
+                            pygame.Rect(887, 91, 54, 36), pygame.Rect(1088, 114, 74, 13), pygame.Rect(1287, 120, 74, 8)]
         ]
         self.animate(IDLE)
     def jump(self):

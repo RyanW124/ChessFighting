@@ -1,28 +1,27 @@
-import pygame, os, scenes, Model, fight, Martials, UI, pickle
+import pygame, os, scenes, Model, fight, Martials, UI, pickle, Controller
+from time import sleep
 import sys
 global window_size_x, window_size_y
 from Model import Button
 window_size_y = 830
 window_size_x = int(window_size_y*1.7)
 SIZE = (window_size_x, window_size_y)
-fight_time = 30
-chess_time = 60
+
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 GREY = (100, 100, 100)
 PURPLE = (255, 0, 255)
+
 def main():
     pygame.init()
-    game = Model.Game()
+
     surface = pygame.display.set_mode([window_size_x,window_size_y])
     pygame.display.set_caption('Martial Chess')
     clock = pygame.time.Clock()
-    game.p1.fighter = Martials.Blue(['Martial Hero', 'Sprites'], 10, window_size_y, game.p1)
-    game.p2.fighter = Martials.Red(['Martial Hero 2', 'Sprites'], window_size_x-30, window_size_y, game.p2)
-    quit = False
 
+    quit = False
     try:
         with open("Controls.dat", "rb") as f:
             keys = pickle.load(f)
@@ -30,6 +29,7 @@ def main():
         keys = Model.Settings()
         with open("Controls.dat", "wb") as f:
             pickle.dump(keys, f)
+
     rect = pygame.Rect(0, 0, SIZE[0]*0.2, SIZE[1]/5)
     rect.midtop = (SIZE[0]/2, SIZE[1]/6)
     for text, name in [('Play', 'start'), ('Help', 'help'), ('Settings', 'settings'), ('Quit', 'quit')]:
@@ -65,38 +65,81 @@ def main():
         Button(rect.copy(), text, BLACK, name, PURPLE, Button.settings, (PURPLE, 5))
         rect.centery += SIZE[1]/6
 
+    rect = pygame.Rect(0, 0, SIZE[0]/8, SIZE[1]/10)
+    rect.midtop = (SIZE[0]/2, SIZE[1]/3)
+
+    for text, name in [('Unpause', 'unpause'), ('Settings', 'settings'), ('Home', 'home'), ('Quit', 'quit')]:
+        Button(rect.copy(), text, BLACK, name, PURPLE, Button.pause, (PURPLE, 5))
+        rect.centery += SIZE[1]/10
+
     Button(pygame.Rect(10, 10, SIZE[0]*0.1, SIZE[1]/10), 'Back', BLACK, 'back', PURPLE, Button.settings, (PURPLE, 5))
     Button(pygame.Rect(10, 10, SIZE[0]*0.1, SIZE[1]/10), 'Back', BLACK, 'back', PURPLE, Button.help_menu, (PURPLE, 5))
+    Button(pygame.Rect(10, 10, SIZE[0]*0.1, SIZE[1]/10), 'Back', BLACK, 'back', PURPLE, Button.choose, (PURPLE, 5))
+
+    rect = pygame.Rect(0, 0, SIZE[0]/8, SIZE[1]/10)
+    rect.midtop = (SIZE[0]/2, SIZE[1]/3)
+
+    for text, name in [('New Game', 'new'), ('Continue Game', 'continue')]:
+        Button(rect.copy(), text, BLACK, name, PURPLE, Button.choose, (PURPLE, 5))
+        rect.centery += SIZE[1]/10
+    Button(pygame.Rect(SIZE[0]/2-SIZE[0]*0.05, SIZE[1]*0.62, SIZE[0]*0.1, SIZE[1]/10), 'Home', BLACK, 'home', PURPLE, Button.end, (PURPLE, 5))
+    Button(pygame.Rect(SIZE[0]/2-SIZE[0]*0.025, SIZE[1]*0.54, SIZE[0]*0.05, SIZE[1]/20), 'Hide', BLACK, 'hide', PURPLE, Button.end, (PURPLE, 5))
+    click = False
     while True:
-        quit = UI.main_menu(surface, clock, keys)
+        try:
+            with open("save.dat", "rb") as f:
+                saved = pickle.load(f)
+                if saved.finished:
+                    saved = None
+        except FileNotFoundError:
+            saved = None
+        home = False
+        quit, save = UI.main_menu(surface, clock, keys, saved)
+        if save == None:
+            continue
+        if save:
+            game = saved
+            game.p1.fighter = Martials.Blue(['Martial Hero', 'Sprites'], 10, window_size_y, game.p1)
+            game.p2.fighter = Martials.Red(['Martial Hero 2', 'Sprites'], window_size_x-30, window_size_y, game.p2)
+        else:
+            game = Model.Game()
+            game.p1.fighter = Martials.Blue(['Martial Hero', 'Sprites'], 10, window_size_y, game.p1)
+            game.p2.fighter = Martials.Red(['Martial Hero 2', 'Sprites'], window_size_x-30, window_size_y, game.p2)
         if quit:
             break
+        click = True
+        clock.tick()
         while True:
             game.p1.update_time()
             game.p2.update_time()
+
             quit = scenes.countdown(surface, game, clock, keys)
             if quit:
                 break
-            quit = scenes.game_chess(surface, game, clock, keys)
-            if quit:
-                break
+            if game.round%2==1:
+                quit, home = scenes.game_chess(surface, game, clock, keys)
+                if quit or home:
+                    break
+            else:
+                for i in Martials.Bullet.bullets:
+                    del i
+                Martials.Bullet.bullets.clear()
+                game.p1.fighter.x, game.p1.fighter.y = 10, window_size_y
+                game.p2.fighter.x, game.p2.fighter.y = window_size_x-30, window_size_y
+                quit, home = fight.game_fight(surface, game, clock, keys)
+                if quit or home:
+                    break
             game.round+=1
             if game.round == 10:
                 break
+        if click:
+            game.p1.fighter=None
+            game.p2.fighter=None
+            with open("save.dat", 'wb') as f:
+                pickle.dump(game, f)
 
-            quit = scenes.countdown(surface, game, clock, keys)
-            if quit:
-                break
-            for i in Martials.Bullet.bullets:
-                del i
-            Martials.Bullet.bullets.clear()
-            game.p1.fighter.x, game.p1.fighter.y = 10, window_size_y
-            game.p2.fighter.x, game.p2.fighter.y = window_size_x-30, window_size_y
-            quit = fight.game_fight(surface, game, clock, keys)
-            if quit:
-                break
-            game.round+=1
-
+        if home:
+            continue
         if not quit:
             if game.p2.consciousness>game.p1.consciousness:
                 game.winner = game.p2
@@ -105,13 +148,17 @@ def main():
             else:
                 game.winner = game.p2
             surface.fill(BLACK)
-            game_end(surface, game)
+
+            quit, home = game_end(surface, game, keys)
+        if home:
+            continue
         if quit:
             break
     with open("Controls.dat", "wb") as f:
         pickle.dump(keys, f)
     pygame.quit()
-def game_end(surface, game):
+def game_end(surface, game, keys):
+    game.finished = True
     font = pygame.font.Font('freesansbold.ttf', 50)
     rect = pygame.Rect(0, 0, SIZE[0]*0.6, SIZE[1]*0.2)
     rect.center = (SIZE[0]/2, SIZE[1]/2)
@@ -127,12 +174,17 @@ def game_end(surface, game):
     textRect = text.get_rect()
     textRect.center = (SIZE[0]/2, SIZE[1]/2)
     surface.blit(text, textRect)
+    for i in Model.Button.end:
+        surface.blit(i.surface, i.rect)
     pygame.display.flip()
+    home = False
     while True:
-        quit = Controller.game_end()
-        if quit:
+        quit, button = Controller.game_end(keys)
+        if quit or button == 'home':
+            home = button=='home'
+
             break
-    return quit
+    return quit, home
 
 if __name__ == "__main__":
     main()

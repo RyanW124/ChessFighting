@@ -1,4 +1,4 @@
-import main, pygame, Chess
+import main, pygame, Chess, convertpath
 
 class Player:
     def __init__(self, consciousness):
@@ -8,8 +8,8 @@ class Player:
         self.move_time = 30
     def update_time(self):
         self.move_time = int(self.consciousness*0.3)
-        if self.move_time<10:
-            self.move_time=10
+        if self.move_time<5:
+            self.move_time=5
         if self.move_time>self.time:
             self.move_time = self.time
 
@@ -20,11 +20,17 @@ class Game:
         self.p2 = Player(100)
         self.board = Chess.Board()
         self.winner = None
+        self.finished = False
+        self.fight_time = 30
+        self.chess_time = 60
 
 class Button:
     main_menu = []
     settings = []
     help_menu = []
+    pause = []
+    end = []
+    choose = []
     def __init__(self, rect, text, color, name, textColor, scene, outline = None):
         self.rect = rect
         self.text = text
@@ -53,7 +59,7 @@ class Button:
         textRect.center = self.surface.get_rect().center
         self.surface.blit(text, textRect)
     @classmethod
-    def get_button(self, scene, name):
+    def get_button(cls, scene, name):
         for i in scene:
             if i.name == name:
                 return i
@@ -81,5 +87,17 @@ class Settings:
                     yield i
 
 
+class AudioController:
+
+    def __init__(self, filename, v=0.5, loop=0):
+        self.volume = v
+        self.right_channel = 0.5
+        path = convertpath.path(['sounds', filename])
+        self.mix = pygame.mixer.Sound(path)
+        self.channel = pygame.mixer.find_channel()
+        self.channel.play(self.mix, loops = loop)
+        self.channel.set_volume(self.volume)
+    def stop(self):
+        self.channel.stop()
 if __name__ == "__main__":
     main.main()
