@@ -99,5 +99,79 @@ class AudioController:
         self.channel.set_volume(self.volume)
     def stop(self):
         self.channel.stop()
+class MeteorWarning:
+    initial_frequence = 7
+    def __init__(self, w, h, color):
+        self.fading = False
+        self.h = h
+        self.color = color
+        self.frequency = 5
+        self.surface = pygame.Surface((w, h))
+        self.dropping = False
+        self.surface.fill(color)
+        self.surface.set_alpha(125)
+        self.meteor = Meteor(self.surface, h)
+
+    def update(self):
+        if self.dropping:
+            self.surface.fill((0,0,0))
+            self.surface.set_alpha(255)
+
+            self.meteor.draw()
+            self.surface.set_colorkey(self.surface.get_at((0,0)))
+            if self.meteor.y >= self.h:
+                self.dropping = False
+                self.surface.fill(self.color)
+                self.surface.set_alpha(125)
+                self.meteor.set_y(-50)
+                return True
+        else:
+            if self.frequency==2:
+                self.frequency=5
+                self.dropping = True
+
+            else:
+                if self.fading:
+                    self.surface.set_alpha(self.surface.get_alpha()-125/self.frequency)
+                    if self.surface.get_alpha()<=0:
+                        self.fading = False
+                        self.frequency-=1
+                else:
+                    self.surface.set_alpha(self.surface.get_alpha()+125/self.frequency)
+                    if self.surface.get_alpha()>=125:
+                        self.fading = True
+        return False
+class Meteor:
+    def __init__(self, surface, h):
+        self.y = -50
+        self.h = h
+        self.surface = surface
+        self.image = pygame.image.load(convertpath.path(['sprites', 'meteor.png'])).convert()
+        self.image.set_colorkey(self.image.get_at((0,0)))
+        self.image = pygame.transform.scale(self.image, (100, 100))
+        self.rect = self.image.get_rect()
+        self.rect.center = self.surface.get_rect().center
+        self.rect.bottom = self.y
+    def set_y(self, num):
+        self.y = num
+        self.rect.bottom = self.y
+    def draw(self):
+        self.y+=50
+        if self.y>=self.h:
+            self.y = self.h
+        self.rect.bottom = self.y
+        self.surface.blit(self.image, self.rect)
+
+class SafeZone:
+    def __init__(self):
+        self.zone = Zone()
+        self.left = None
+        self.right = None
+    def new_zone(self):
+        pass
+
+class Zone:
+    def __init__(self):
+        pass
 if __name__ == "__main__":
     main.main()

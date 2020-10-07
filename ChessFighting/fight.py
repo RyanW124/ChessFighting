@@ -29,12 +29,39 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
     pr2 = False
     p2j = False
     home = False
+    if game.round>=6:
+        meteor = Model.MeteorWarning(100, int(SIZE[1]*0.8), (255, 122, 0))
+    else:
+        meteor = None
     music = Model.AudioController('fight.wav', 0.2, -1)
+    if meteor:
+        meteorx = randint(0, SIZE[0]-100)
     while True:
         clock.tick(30)
         surface.fill((0,0,0))
         quit, pause, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j, keys)
+        if meteor:
+            if meteor.update():
+                meteorx = randint(0, SIZE[0]-100)
+            meteor_rect = meteor.meteor.rect.copy()
+            meteor_rect.left=meteorx
+            meteor_back = False
+            if p1.rect:
+                if meteor_rect.colliderect(p1.rect):
+                    meteor_back = True
+                    p1.take_damage(10, meteor_rect.centerx)
+            if p2.rect:
+                if meteor_rect.colliderect(p2.rect):
+                    meteor_back = True
+                    p2.take_damage(10, meteor_rect.centerx)
+            if meteor_back:
+                meteorx = randint(0, SIZE[0]-100)
+                meteor.dropping = False
+                meteor.surface.fill(meteor.color)
+                meteor.surface.set_alpha(125)
+                meteor.meteor.set_y(-50)
 
+                meteor.dropping = False
         if pl2 and not pr2 and p2.animation!=TAKE_HIT and p2.rect.left>p2.speed:
             p2.dir = False
             p2.x-=p2.speed
@@ -83,6 +110,8 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
             Martials.Bullet(1, game.p1.fighter, game.p2.fighter)
             p1.t2 = 0
         blit_image(surface, ['Background', bkgrnd+'.png'], "topleft", (0,0), (int(SIZE[0]), int(SIZE[1]*0.8)))
+        if meteor:
+            surface.blit(meteor.surface, (meteorx,0))
         p1.update(p2)
         p1_surface = p1.draw()
         p2.update(p1)
@@ -114,7 +143,7 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
             game.fight_time-=clock.get_time()/1000
         if quit or home:
             break
-        if game.fight_timetime<=0:
+        if game.fight_time<=0:
             game.fight_time = 30
             break
         pygame.display.flip()

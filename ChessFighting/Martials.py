@@ -1,4 +1,5 @@
 import pygame, convertpath, main
+from copy import deepcopy
 animations = [IDLE, ATTACK_ONE, ATTACK_TWO, JUMP, FALL, RUN, TAKE_HIT, DEATH] = range(8)
 SIZE = (1.7*830, 830)
 class Blue(pygame.sprite.Sprite):
@@ -142,8 +143,9 @@ class Bullet(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         Bullet.bullets.append(self)
         self.dir = parent.dir
+        self.parent = parent
         self.oppo = oppo
-
+        self.player = player
         if player ==2:
             self.image = pygame.image.load(convertpath.path(['Martial Hero 2', 'Sprites', 'bullet.png'])).convert()
         else:
@@ -166,9 +168,23 @@ class Bullet(pygame.sprite.Sprite):
             self.x-=self.speed
             self.rect.centerx-=self.speed
         if self.rect.colliderect(self.oppo.rect):
-            self.oppo.parent.consciousness-=Blue.damage_2
-            Bullet.bullets.remove(self)
-            del self
+            if self.oppo.animation == ATTACK_ONE and self.oppo.dir != self.dir:
+                self.dir = not self.dir
+                if self.player == 1:
+                    self.image = self.image = pygame.image.load(convertpath.path(['Martial Hero 2', 'Sprites', 'bullet.png'])).convert()
+                    self.player = 2
+
+                else:
+                    self.image = self.image = pygame.image.load(convertpath.path(['Martial Hero', 'Sprites', 'bullet.png'])).convert()
+                    self.player = 1
+                self.image.set_colorkey(self.image.get_at((0,0)))
+
+                self.oppo, self.parent = self.parent, self.oppo
+
+            else:
+                self.oppo.take_damage(Blue.damage_2, self.x)
+                Bullet.bullets.remove(self)
+                del self
         elif self.rect.right<0 or self.rect.left>SIZE[0]:
             del self
     def draw(self, surface):

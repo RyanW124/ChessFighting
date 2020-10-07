@@ -1,5 +1,6 @@
 import pygame, os, scenes, Model, fight, Martials, UI, pickle, Controller
 from time import sleep
+from pygame.locals import *
 import sys
 global window_size_x, window_size_y
 from Model import Button
@@ -112,7 +113,7 @@ def main():
         while True:
             game.p1.update_time()
             game.p2.update_time()
-
+#             game.round =2
             quit = scenes.countdown(surface, game, clock, keys)
             if quit:
                 break
@@ -156,6 +157,7 @@ def main():
             break
     with open("Controls.dat", "wb") as f:
         pickle.dump(keys, f)
+
     pygame.quit()
 def game_end(surface, game, keys):
     game.finished = True
