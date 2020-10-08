@@ -29,6 +29,17 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
     pr2 = False
     p2j = False
     home = False
+    zone = None
+
+    font = pygame.font.Font('freesansbold.ttf', 100)
+    text = font.render(f"Zone closing in", True, PURPLE, BLACK)
+    inc = True
+    textRect = text.get_rect()
+    textRect.center = (SIZE[0]*0.3, SIZE[1]*0.1)
+    zoneWarn = pygame.Surface((SIZE[0]*0.6, SIZE[1]*0.2))
+    pygame.draw.rect(zoneWarn, PURPLE, pygame.Rect((0,0), zoneWarn.get_size()), 5)
+    zoneWarn.blit(text, textRect)
+    zoneWarn.set_alpha(255)
     if game.round>=6:
         meteor = Model.MeteorWarning(100, int(SIZE[1]*0.8), (255, 122, 0))
     else:
@@ -39,6 +50,9 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
     while True:
         clock.tick(30)
         surface.fill((0,0,0))
+
+        if game.fight_time<25 and not zone and game.round>=6:
+            zone = Model.Zone(350, 100, p1, p2)
         quit, pause, shoot, pl, pr, p1j, shoot2, pl2, pr2, p2j, s1, s2= Controller.fight1(game, pl, pr, p1j, pl2, pr2, p2j, keys)
         if meteor:
             if meteor.update():
@@ -112,13 +126,33 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
         blit_image(surface, ['Background', bkgrnd+'.png'], "topleft", (0,0), (int(SIZE[0]), int(SIZE[1]*0.8)))
         if meteor:
             surface.blit(meteor.surface, (meteorx,0))
+        if zone:
+            zone.update()
+            ts = zone.draw()
+            ts.set_colorkey(ts.get_at((0,0)))
+            ts.set_colorkey(BLACK)
+            surface.blit(ts, (0,0))
+            pygame.draw.line(surface, (255, 0, 255), (zone.left, 0), (zone.left, SIZE[1]*0.8), 3)
+            pygame.draw.line(surface, (255, 0, 255), (zone.right, 0), (zone.right, SIZE[1]*0.8), 3)
+            pygame.draw.line(surface, (255, 255, 255), (zone.dest_left, 0), (zone.dest_left, SIZE[1]*0.8), 3)
+            pygame.draw.line(surface, (255, 255, 255), (zone.dest_right, 0), (zone.dest_right, SIZE[1]*0.8), 3)
         p1.update(p2)
         p1_surface = p1.draw()
         p2.update(p1)
         p2_surface = p2.draw()
-
+        if 25<game.fight_time<28 and game.round>=6:
+            zr = pygame.Rect((0,0), zoneWarn.get_size())
+            zr.center = (SIZE[0]/2, SIZE[1]*0.4)
+            surface.blit(zoneWarn, zr)
+            if inc:
+                zoneWarn.set_alpha(zoneWarn.get_alpha()-50)
+            else:
+                zoneWarn.set_alpha(zoneWarn.get_alpha()+50)
+            if zoneWarn.get_alpha()<=0 or zoneWarn.get_alpha()>=255:
+                inc = not inc
         surface.blit(p1_surface, p1.rect)
         surface.blit(p2_surface, p2.rect)
+
         for i in Martials.Bullet.bullets:
             i.update()
             i.draw(surface)

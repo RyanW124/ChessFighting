@@ -1,5 +1,8 @@
 import main, pygame, Chess, convertpath
-
+from random import randint
+window_size_y = 830
+window_size_x = int(window_size_y*1.7)
+SIZE = (window_size_x, window_size_y)
 class Player:
     def __init__(self, consciousness):
         self.consciousness = consciousness
@@ -162,16 +165,50 @@ class Meteor:
         self.rect.bottom = self.y
         self.surface.blit(self.image, self.rect)
 
-class SafeZone:
-    def __init__(self):
-        self.zone = Zone()
-        self.left = None
-        self.right = None
-    def new_zone(self):
-        pass
 
 class Zone:
-    def __init__(self):
-        pass
+
+    def __init__(self, width, time, p1, p2):
+        self.width = width
+        self.left = 0
+        self.p1 = p1
+        self.p1_dmg = 0
+        self.p2 = p2
+        self.p2_dmg = 0
+        self.time = time
+        self.dist_left = 0
+        self.dest_right = 0
+        self.right = SIZE[0]
+        self.new()
+    def update(self):
+        self.left+=self.dist_left/self.time
+        self.right+=self.dist_right/self.time
+        self.p1_dmg+=1
+        if (self.p1.rect.centerx < self.left or self.p1.rect.centerx > self.right) and self.p1_dmg>=10:
+            self.p1.parent.consciousness-=1
+            self.p1_dmg=0
+        self.p2_dmg+=1
+        if (self.p2.rect.centerx < self.left or self.p2.rect.centerx > self.right) and self.p2_dmg>=10:
+            self.p2.parent.consciousness-=1
+            self.p2_dmg=0
+        if (self.dist_right>0 and self.right>=self.dest_right) or (self.dist_right<0 and self.right<=self.dest_right):
+            self.new()
+    def draw(self):
+        surface=pygame.Surface(SIZE)
+        pygame.draw.rect(surface, (255, 0, 255, 20), pygame.Rect(0,0,self.left, SIZE[1]*0.8))
+        pygame.draw.rect(surface, (255, 0, 255, 20), pygame.Rect(self.right,0,SIZE[0]-self.right, SIZE[1]*0.8))
+
+        surface.set_alpha(50)
+        return surface
+    def new(self):
+        self.dist_right = 0
+        while abs(self.dist_right)<200:
+            self.dest_left = randint(0, SIZE[0]-self.width)
+            self.dest_right = self.dest_left+self.width
+            self.dist_left = self.dest_left-self.left
+
+            self.dist_right = self.dest_right-self.right
+
+
 if __name__ == "__main__":
     main.main()

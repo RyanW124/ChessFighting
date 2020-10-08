@@ -113,7 +113,7 @@ def main():
         while True:
             game.p1.update_time()
             game.p2.update_time()
-#             game.round =2
+#             game.round =2                             #only uncomment to test fight
             quit = scenes.countdown(surface, game, clock, keys)
             if quit:
                 break
