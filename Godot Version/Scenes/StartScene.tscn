@@ -1,0 +1,80 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scripts/StartScene.gd" type="Script" id=1]
+[ext_resource path="res://set.tres" type="DynamicFont" id=2]
+[ext_resource path="res://box.tres" type="StyleBox" id=3]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 1 )
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color( 0.784314, 0, 0.784314, 1 )
+
+[node name="StartScene" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -191.5
+margin_top = -203.5
+margin_right = 191.5
+margin_bottom = 203.5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Start" type="Button" parent="ColorRect/VBoxContainer"]
+margin_right = 383.0
+margin_bottom = 133.0
+custom_styles/hover = ExtResource( 3 )
+custom_styles/pressed = ExtResource( 3 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color_disabled = Color( 0.784314, 0, 0.784314, 1 )
+custom_colors/font_color = Color( 0.784314, 0, 0.784314, 1 )
+text = "Start"
+
+[node name="Settings" type="Button" parent="ColorRect/VBoxContainer"]
+margin_top = 137.0
+margin_right = 383.0
+margin_bottom = 270.0
+custom_styles/hover = ExtResource( 3 )
+custom_styles/pressed = ExtResource( 3 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color_disabled = Color( 0.784314, 0, 0.784314, 1 )
+custom_colors/font_color = Color( 0.784314, 0, 0.784314, 1 )
+text = "Settings"
+
+[node name="Quit" type="Button" parent="ColorRect/VBoxContainer"]
+margin_top = 274.0
+margin_right = 383.0
+margin_bottom = 407.0
+custom_styles/hover = ExtResource( 3 )
+custom_styles/pressed = ExtResource( 3 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color_disabled = Color( 0.784314, 0, 0.784314, 1 )
+custom_colors/font_color = Color( 0.784314, 0, 0.784314, 1 )
+text = "Quit"
+[connection signal="button_up" from="ColorRect/VBoxContainer/Start" to="." method="_on_Start_button_up"]
+[connection signal="button_up" from="ColorRect/VBoxContainer/Settings" to="." method="_on_Settings_button_up"]
+[connection signal="button_up" from="ColorRect/VBoxContainer/Quit" to="." method="_on_Quit_button_up"]

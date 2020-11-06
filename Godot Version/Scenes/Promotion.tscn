@@ -1,0 +1,92 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Images/Chess/01_basicNormal_02.png" type="Texture" id=1]
+[ext_resource path="res://Scripts/Promotion.gd" type="Script" id=2]
+[ext_resource path="res://Images/Chess/01_basicNormal_04.png" type="Texture" id=3]
+[ext_resource path="res://Images/Chess/01_basicNormal_03.png" type="Texture" id=4]
+[ext_resource path="res://Images/Chess/01_basicNormal_05.png" type="Texture" id=5]
+
+[node name="Promotion" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -1040.0
+margin_bottom = -430.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+margin_right = 400.0
+margin_bottom = 400.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 395.0
+margin_bottom = 395.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Queen" type="TextureButton" parent="."]
+margin_right = 200.0
+margin_bottom = 200.0
+texture_normal = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Knight" type="TextureButton" parent="."]
+margin_left = 200.0
+margin_right = 400.0
+margin_bottom = 200.0
+texture_normal = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Bishop" type="TextureButton" parent="."]
+margin_top = 200.0
+margin_right = 200.0
+margin_bottom = 400.0
+texture_normal = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Rook" type="TextureButton" parent="."]
+margin_left = 200.0
+margin_top = 200.0
+margin_right = 400.0
+margin_bottom = 400.0
+texture_normal = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect3" type="ColorRect" parent="."]
+margin_top = 197.5
+margin_right = 400.0
+margin_bottom = 202.5
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect4" type="ColorRect" parent="."]
+margin_left = 197.5
+margin_right = 202.5
+margin_bottom = 400.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="Queen" to="." method="_on_Queen_pressed"]
+[connection signal="button_up" from="Knight" to="." method="_on_Knight_button_up"]
+[connection signal="button_up" from="Bishop" to="." method="_on_Bishop_button_up"]
+[connection signal="button_up" from="Rook" to="." method="_on_Rook_button_up"]

@@ -15,7 +15,8 @@ def game_fight(surface : pygame.Surface, game, clock, keys):
     global SIZE
     SIZE = (main.window_size_x, main.window_size_y)
     quit = False
-    bkgrnd = str(randint(1, 2))
+    bkgrnd = str(randint(2, 5))
+#     bkgrnd = '5'
 
     blit_image(surface, ['Background', bkgrnd+'.png'], "topleft", (0,0), (int(SIZE[0]), int(SIZE[1])))
 #     blit_image(surface, ['Martial Hero', 'Sprites', 'Idle.png'], "topleft", (0,0))

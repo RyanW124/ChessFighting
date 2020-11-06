@@ -1,0 +1,251 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Scripts/Main.gd" type="Script" id=1]
+[ext_resource path="res://Images/Chess/Basic Chess Asset/Boards/board_3_basic.png" type="Texture" id=2]
+[ext_resource path="res://Scenes/Promotion.tscn" type="PackedScene" id=3]
+[ext_resource path="res://font.tres" type="DynamicFont" id=4]
+[ext_resource path="res://Images/Martial Hero 2/Sprites/Head.png" type="Texture" id=5]
+[ext_resource path="res://Images/Martial Hero/Sprites/Head.png" type="Texture" id=6]
+
+[node name="Main" type="Node2D"]
+script = ExtResource( 1 )
+promotion_file = "res://Scenes/Promotion.tscn"
+board_file = "res://Scripts/Board.gd"
+game_file = "res://Scripts/Game.gd"
+fight_file = "res://Scenes/FightScene.tscn"
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 1440.0
+margin_bottom = 830.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Midline" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 715.0
+margin_right = 725.0
+margin_bottom = 830.0
+color = Color( 0.784314, 0, 0.784314, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="p1" type="Node2D" parent="."]
+
+[node name="Head" type="Sprite" parent="p1"]
+position = Vector2( 100, 100 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 6 )
+
+[node name="Stats" type="ColorRect" parent="p1"]
+margin_top = 680.0
+margin_right = 715.0
+margin_bottom = 830.0
+color = Color( 0, 0, 0.784314, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="Label" parent="p1/Stats"]
+margin_right = 40.0
+margin_bottom = 14.0
+rect_scale = Vector2( 0.0903397, 0.0903397 )
+custom_fonts/font = ExtResource( 4 )
+text = "Player 1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="consciousness" type="Label" parent="p1/Stats"]
+margin_left = 18.5813
+margin_top = 65.0352
+margin_right = 1853.58
+margin_bottom = 624.035
+rect_scale = Vector2( 0.0631294, 0.0631294 )
+custom_fonts/font = ExtResource( 4 )
+text = "1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Back" type="ColorRect" parent="p1/Stats"]
+margin_left = 20.0
+margin_top = 110.0
+margin_right = 700.0
+margin_bottom = 125.0
+
+[node name="Con" type="ColorRect" parent="p1/Stats"]
+margin_left = 20.0
+margin_top = 110.0
+margin_right = 700.0
+margin_bottom = 125.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="p1/Stats"]
+
+[node name="time" type="Label" parent="p1/Stats"]
+margin_left = 240.0
+margin_top = 30.0
+margin_right = 2075.0
+margin_bottom = 589.0
+rect_scale = Vector2( 0.0631294, 0.0631294 )
+custom_fonts/font = ExtResource( 4 )
+text = "1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="p2" type="Node2D" parent="."]
+position = Vector2( 720, 0 )
+
+[node name="Head2" type="Sprite" parent="p2"]
+position = Vector2( 100, 100 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 5 )
+
+[node name="Stats" type="ColorRect" parent="p2"]
+margin_left = 5.0
+margin_top = 680.0
+margin_right = 720.0
+margin_bottom = 830.0
+color = Color( 0.784314, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="Label" parent="p2/Stats"]
+margin_right = 40.0
+margin_bottom = 14.0
+rect_scale = Vector2( 0.0903397, 0.0903397 )
+custom_fonts/font = ExtResource( 4 )
+text = "Player 2"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="consciousness" type="Label" parent="p2/Stats"]
+margin_left = 18.5813
+margin_top = 65.0352
+margin_right = 1853.58
+margin_bottom = 624.035
+rect_scale = Vector2( 0.0631294, 0.0631294 )
+custom_fonts/font = ExtResource( 4 )
+text = "2"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="time" type="Label" parent="p2/Stats"]
+margin_left = 240.0
+margin_top = 30.0
+margin_right = 2075.0
+margin_bottom = 589.0
+rect_scale = Vector2( 0.0631294, 0.0631294 )
+custom_fonts/font = ExtResource( 4 )
+text = "2"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Back" type="ColorRect" parent="p2/Stats"]
+margin_left = 20.0
+margin_top = 110.0
+margin_right = 700.0
+margin_bottom = 125.0
+
+[node name="Timer" type="Timer" parent="p2/Stats"]
+
+[node name="Con" type="ColorRect" parent="p2/Stats"]
+margin_left = 20.0
+margin_top = 110.0
+margin_right = 700.0
+margin_bottom = 125.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="board1" type="Sprite" parent="."]
+position = Vector2( 360, 415 )
+texture = ExtResource( 2 )
+
+[node name="board2" type="Sprite" parent="."]
+position = Vector2( 1080, 415 )
+texture = ExtResource( 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 0.282353 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Promotion" parent="CanvasLayer/ColorRect" instance=ExtResource( 3 )]
+margin_left = 520.0
+margin_top = 215.0
+margin_right = -520.0
+margin_bottom = -215.0
+
+[node name="check" type="Label" parent="CanvasLayer"]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -277.732
+margin_right = 1278.27
+margin_bottom = 559.0
+rect_scale = Vector2( 0.331552, 0.331552 )
+custom_fonts/font = ExtResource( 4 )
+text = "Check!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ChessTime" type="Timer" parent="."]
+one_shot = true
+
+[node name="FightTime" type="Timer" parent="."]
+one_shot = true
+
+[node name="ShowTime" type="ColorRect" parent="."]
+margin_left = 620.0
+margin_top = 365.0
+margin_right = 820.0
+margin_bottom = 465.0
+color = Color( 0.784314, 0, 0.784314, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="ShowTime"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 190.0
+margin_bottom = 90.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="ShowTime"]
+margin_right = 3200.0
+margin_bottom = 1598.0
+rect_scale = Vector2( 0.0625248, 0.0625248 )
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.784314, 0, 0.784314, 1 )
+text = "Time Left:
+60s"
+align = 1
+valign = 1
+[connection signal="timeout" from="p1/Stats/Timer" to="." method="_on_Timer1_timeout"]
+[connection signal="timeout" from="p2/Stats/Timer" to="." method="_on_Timer2_timeout"]
+[connection signal="timeout" from="ChessTime" to="." method="_on_ChessTime_timeout"]
+[connection signal="timeout" from="FightTime" to="." method="_on_FightTime_timeout"]
